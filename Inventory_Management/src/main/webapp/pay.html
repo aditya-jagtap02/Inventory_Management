@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Method</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+    }
+    .container {
+      width: 350px; /* Adjust as needed */
+      margin: 20px auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .header img {
+      width: 24px; /* Adjust as needed */
+      height: 24px;
+      cursor: pointer;
+    }
+    .progress {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .progress span {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+    }
+    .progress span.active {
+      background-color: #84c225; /* Purple */
+      color: white;
+    }
+    .payment-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .payment-option.selected {
+      border-color: #84c225;
+      background-color: #f3e5f5; /* Light purple */
+    }
+    .payment-option .left {
+      display: flex;
+      align-items: center;
+    }
+    .payment-option .left img {
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+    }
+    .payment-option .right input[type="radio"] {
+      display: none;
+    }
+    .payment-option .right label {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 50%;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .payment-option.selected .right label {
+      border-color: #84c225;
+      background-color: white;
+    }
+    .payment-option .right label::after {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      background-color: #84c225;
+      border-radius: 50%;
+      margin: 3px;
+      opacity: 0;
+    }
+    .payment-option.selected .right label::after {
+      opacity: 1;
+    }
+    .discount {
+      color: green;
+      font-size: 12px;
+    }
+    .view-offers {
+      color: #84c225;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .expandable {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .expandable-content {
+      display: none;
+      padding-top: 10px;
+    }
+    .expandable.expanded .expandable-content {
+      display: block;
+    }
+    .place-order {
+      background-color: #84c225;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      width: 100%;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .price-details {
+      color:  #84c225;
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <img src="logo.png" alt="Back">
+    <span>PAYMENT METHOD</span>
+    <span></span>
+  </div>
+  <p>Select payment method</p>
+
+  <div class="payment-option selected" data-payment="pay-online">
+    <div class="left">
+      <span>₹174</span>
+      <span>Pay Online</span>
+    </div>
+    <div class="right">
+      <input type="radio" id="pay-online" name="payment" checked>
+      <label for="pay-online"></label>
+    </div>
+  </div>
+
+  <div class="payment-option" data-payment="cash-on-delivery">
+    <div class="left">
+      <span>₹207</span>
+      <span>Cash on Delivery</span>
+    </div>
+    <div class="right">
+      <input type="radio" id="cash-on-delivery" name="payment">
+      <label for="cash-on-delivery"></label>
+    </div>
+  </div>
+
+  <p><span class="view-offers">Extra discount with bank offers</span></p>
+
+  <p>Last Used</p>
+
+  <div class="payment-option" data-payment="gpay">
+    <div class="left">
+      <img src="gpay_logo.png" alt="GPay">
+      <span>GPay</span>
+    </div>
+    <div class="right">
+      <input type="radio" id="gpay" name="payment">
+      <label for="gpay"></label>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable="upi">
+    <span>UPI Pay by any UPI App <span class="view-offers">Offers Available</span></span>
+    <div class="expandable-content">
+      <p>UPI options go here...</p>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable="wallet">
+    <span>Wallet</span>
+    <div class="expandable-content">
+      <p>Wallet options go here...</p>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable="cards">
+    <span>Debit/Credit Cards <span class="view-offers">Offers Available</span></span>
+    <div class="expandable-content">
+      <p>Card options go here...</p>
+    </div>
+  </div>
+
+  <div class="expandable" data-expandable="netbanking">
+    <span>Net Banking</span>
+    <div class="expandable-content">
+      <p>Net banking options go here...</p>
+    </div>
+  </div>
+
+  <a href="lastpage.html"><button class="place-order">PAY</button></a>
+  <p class="price-details">VIEW ORDER</p>
+</div>
+
+<script>
+  document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', function() {
+      document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+      this.classList.add('selected');
+      document.querySelectorAll('input[name="payment"]').forEach(input => input.checked = false);
+      document.getElementById(this.dataset.payment).checked = true;
+    });
+  });
+
+  document.querySelectorAll('.expandable').forEach(item => {
+    item.addEventListener('click', function() {
+      this.classList.toggle('expanded');
+    });
+  });
+
+  document.querySelector('.place-order').addEventListener('click', async () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const cart = JSON.parse(localStorage.getItem('cart'));
+
+
+    const orderDetails = Object.keys(cart).map(productId => ({
+      productId: parseInt(productId),
+      quantity: cart[productId].quantity
+    }));
+
+    const data = {
+      action: 'create',
+      userId: user.id,
+      totalAmount: Object.values(cart).reduce((sum, item) => sum + (item.price * item.quantity), 0),
+      orderDate: new Date().toISOString(),
+      orderDetails
+    };
+
+    const response = await fetch('http://localhost:8080/inventory-management/order', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    const result = await response.text();
+    alert(result);
+
+    if (result === 'Order Placed Successfully') {
+      localStorage.removeItem('cart');
+      window.location.href = 'lastpage.html';
+    }
+  });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    a {
+      color: #4CAF50;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Modal styles */
+    #orderDetailsModal {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .close-btn {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      float: right;
+    }
+
+    .close-btn:hover {
+      background-color: #45a049;
+    }
+
+    input[type="number"] {
+      width: 80px;
+      padding: 6px;
+      margin-right: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Order List</h2>
+<table id="orderTable">
+  <thead>
+  <tr>
+    <th>Order ID</th>
+    <th>User ID</th>
+    <th>Total Amount ($)</th>
+    <th>Order Date</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h2>Product Stock</h2>
+<table id="productTable">
+  <thead>
+  <tr>
+    <th>Product ID</th>
+    <th>Name</th>
+    <th>Price ($)</th>
+    <th>Stock</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- Modal to show products in an order -->
+<div id="orderDetailsModal">
+  <div class="modal-content">
+    <h3>Products in Order</h3>
+    <table id="orderDetailsTable">
+      <thead>
+      <tr>
+        <th>Product ID</th>
+        <th>Name</th>
+        <th>Price ($)</th>
+        <th>Quantity</th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button class="close-btn" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+  async function loadAdminData() {
+    try {
+      const response = await fetch('http://localhost:8080/inventory-management/admin');
+      if (!response.ok) {
+        alert('Access denied or server error');
+        return;
+      }
+      const data = await response.json();
+
+      // Populate order table
+      const orderTable = document.querySelector('#orderTable tbody');
+      orderTable.innerHTML = '';
+      data.orders.forEach(order => {
+        const row = `<tr>
+                    <td>
+                        <a href="#" onclick="showOrderDetails(${order.id})">${order.id}</a>
+                    </td>
+                    <td>${order.userId}</td>
+                    <td>${order.totalAmount.toFixed(2)}</td>
+                    <td>${new Date(order.orderDate).toLocaleString()}</td>
+                </tr>`;
+        orderTable.innerHTML += row;
+      });
+
+      // Populate product table
+      const productTable = document.querySelector('#productTable tbody');
+      productTable.innerHTML = '';
+      data.products.forEach(product => {
+        const row = `<tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price.toFixed(2)}</td>
+                    <td id="stock-${product.id}">${product.quantity}</td>
+                    <td>
+                        <input type="number" id="quantity-${product.id}" min="0" placeholder="New Quantity" />
+                        <button onclick="updateProductQuantity(${product.id})">Update</button>
+                    </td>
+                </tr>`;
+        productTable.innerHTML += row;
+      });
+    } catch (error) {
+      console.error('Error loading admin data:', error);
+      alert('Failed to load data');
+    }
+  }
+
+  async function showOrderDetails(orderId) {
+    try {
+      const response = await fetch(`http://localhost:8080/inventory-management/admin/order-details?orderId=${orderId}`);
+      if (!response.ok) {
+        alert('Failed to load order details');
+        return;
+      }
+
+      const products = await response.json();
+
+      const orderDetailsTable = document.querySelector('#orderDetailsTable tbody');
+      orderDetailsTable.innerHTML = '';
+
+      products.forEach(product => {
+        const row = `<tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price.toFixed(2)}</td>
+                    <td>${product.quantity}</td>
+                </tr>`;
+        orderDetailsTable.innerHTML += row;
+      });
+
+      document.getElementById('orderDetailsModal').style.display = 'flex';
+    } catch (error) {
+      console.error('Error loading order details:', error);
+      alert('Failed to load order details');
+    }
+  }
+
+  async function updateProductQuantity(productId) {
+    const newQuantity = document.getElementById(`quantity-${productId}`).value;
+    if (newQuantity === '' || newQuantity < 0) {
+      alert('Please enter a valid quantity');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/inventory-management/admin/update-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId: productId,
+          newQuantity: parseInt(newQuantity)
+        })
+      });
+
+      if (!response.ok) {
+        alert('Failed to update quantity');
+        return;
+      }
+
+      document.getElementById(`stock-${productId}`).innerText = newQuantity;
+      alert('Quantity updated successfully');
+    } catch (error) {
+      console.error('Error updating product quantity:', error);
+      alert('Failed to update quantity');
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('orderDetailsModal').style.display = 'none';
+  }
+
+  window.onload = loadAdminData;
+</script>
+
+</body>
+</html>

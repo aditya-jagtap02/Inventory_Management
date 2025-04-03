@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Previous Orders</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background-color: #84c225;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header .logo img {
+      width: 80px;
+      height: 80px;
+    }
+
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+    }
+
+    .order-card {
+      background: white;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    .order-details {
+      margin: 5px 0;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #f8f8f8;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+
+    .nav-item {
+      text-align: center;
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .nav-item:hover {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <img src="img/Cargill-removebg-preview.png" alt="Logo">
+  </div>
+  <h1>Previous Orders</h1>
+  <a href="file1.html" target="_blank"><input type="button" value="Login" placeholder="Login"></a>
+</div>
+
+<div class="main-content">
+  <div class="order-card">
+    <div class="order-header">
+      <div>Order #12345</div>
+      <div>Date: 2025-02-15</div>
+    </div>
+    <div class="order-details">Products: Gemini Sunflower 1L, Gemini Sunflower 5L</div>
+    <div class="order-details">Total: ₹630.50</div>
+  </div>
+
+  <div class="order-card">
+    <div class="order-header">
+      <div>Order #12346</div>
+      <div>Date: 2025-02-10</div>
+    </div>
+    <div class="order-details">Products: Gemini Sunflower Jar 15L</div>
+    <div class="order-details">Total: ₹2180</div>
+  </div>
+
+  <div class="order-card">
+    <div class="order-header">
+      <div>Order #12347</div>
+      <div>Date: 2025-02-05</div>
+    </div>
+    <div class="order-details">Products: Gemini Sunflower 1L, Gemini Sunflower 1L</div>
+    <div class="order-details">Total: ₹280</div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <a href="proj.html" class="nav-item">
+    <div>Home</div>
+  </a>
+  <a href="previousOrder.html" class="nav-item">
+    <div>Previous Orders</div>
+  </a>
+  <a href="profile.html" class="nav-item">
+    <div>Profile</div>
+  </a>
+  <a href="cart.html" class="nav-item">
+    <div>Cart</div>
+  </a>
+</nav>
+<script>
+  async function loadOrders() {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) return;
+
+    const response = await fetch(`http://localhost:8080/inventory-management/order?userId=1`);
+    const result = await response.json();
+
+    const orders = result.orders;
+    const orderContainer = document.querySelector('.main-content');
+    orderContainer.innerHTML = '';
+
+    orders.forEach(order => {
+      const orderHTML = `
+            <div class="order-card">
+                <div class="order-header">
+                    <div>Order #${order.id}</div>
+                    <div>Date: ${order.orderDate}</div>
+                </div>
+                <div class="order-details">Total: ₹${order.totalAmount}</div>
+            </div>
+        `;
+      orderContainer.innerHTML += orderHTML;
+    });
+  }
+
+  loadOrders();
+</script>
+</body>
+</html>
